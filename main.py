@@ -73,6 +73,20 @@ def get_random_cafe():
     # })
     return jsonify(cafe=random_cafe.to_dict())
 
+@app.route('/all', methods=['GET'])
+def get_all_cafes():
+    all_cafes = db.session.execute(db.select(Cafe)).scalars().all()
+    cafes_list = [cafe.to_dict() for cafe in all_cafes]
+    return jsonify(cafes=cafes_list)
+
+@app.route('/search', methods=['GET'])
+def get_by_location():
+    location = request.args.get('loc')
+    cafes = db.session.execute(db.select(Cafe).where(Cafe.location == location)).scalars().all()
+    cafes_list = [cafe.to_dict() for cafe in cafes]
+    if not cafes_list:
+        return jsonify(error={"Not Found": "Sorry, we don't have a cafe at that location."})
+    return jsonify(cafes=cafes_list)
 
 
 
